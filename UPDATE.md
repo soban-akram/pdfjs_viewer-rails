@@ -14,8 +14,6 @@ This guide describes how to update the pdf.js javascript library.
 │   │   │   └── pdfjs_viewer
 │   │   │       ├── application.js
 │   │   │       ├── pdfjs
-│   │   │       │   ├── compatibility.js *
-│   │   │       │   ├── l10n.js *
 │   │   │       │   └── pdf.js *
 │   │   │       ├── viewer.js *
 │   │   │       └── viewer_configurations.js
@@ -60,13 +58,17 @@ PDFJS.cMapUrl = '../web/cmaps/';
 with
 ``` javascript
 PDFJS.imageResourcesPath = '/pdfjs/web/images/';
-PDFJS.workerSrc = '/pdfjs/web/pdf.worker.js';
+PDFJS.workerSrc = '/pdfjs/web/pdf.worker.js?version=<version_number>';
 PDFJS.cMapUrl = '/pdfjs/web/cmaps/';
 ```
+
+The version is added as a query string above so we ensure users will get the matching version of the worker despite caching.
 
 ## `app/assets/stylesheets/pdfjs_viewer/pdfjs/viewer.css`
 
 Replace all `url(images/` with `url(/pdfjs/web/images/`
+
+Take extra care here as there are a few instances of inconsistent naming across pdf.js releases! For example the upgrade to 1.10.100 was not a trivial find and replace.
 
 ## `app/views/pdfjs_viewer/viewer/_viewer.html.erb`
 
@@ -88,6 +90,11 @@ Replace all children of `<head>` except the `<meta>` tags with
 <%= render "pdfjs_viewer/viewer/head", title: title, pdf_url: pdf_url %>
 ```
 
+##
+Inject the correct styling class into the body classes.
+```html
+<body tabindex="1" class="loadingInProgress" id="pdfjs_viewer-<%= style %>">
+```
 ##
 
 At the bottom of the file insert `<%= render "pdfjs_viewer/viewer/printcontainer" %>` after `<div id="printContainer"></div>`
